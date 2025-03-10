@@ -1,1 +1,1 @@
-web: gunicorn otree_startup:wsgi --log-file -
+web: otree runprodserver
