@@ -11,7 +11,7 @@ dict(name='buyers',
         ),
 dict(name='Full',
          app_sequence=['Instruction', 'svo', 'buyers', 'survey', 'Results'],
-         num_demo_participants=6,
+         num_demo_participants=4,
         ),
 ]
 
