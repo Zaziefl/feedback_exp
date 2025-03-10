@@ -1,1 +1,1 @@
-web: otree prodserver 8000
+web: gunicorn feedback_exp_buyer.otree_startup:wsgi --log-file -
