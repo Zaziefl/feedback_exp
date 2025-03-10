@@ -17,7 +17,7 @@ class C(BaseConstants):
     CONDITIONS = ['control', 'default', 'omitted']
 
     # File path for items
-    CSV_FILE_PATH = '/Users/zazieflerackers/PycharmProjects/feedback_exp/buyers/items.csv'
+    CSV_FILE_PATH = os.path.join(os.path.dirname(__file__), "items.csv")
 
     # Quiz questions
     QUESTION1 = 'How many points does it cost to leave a rating for an item?'
