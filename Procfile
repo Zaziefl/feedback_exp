@@ -1,1 +1,1 @@
-web: gunicorn feedback_exp_buyer.otree_startup:wsgi --log-file -
+web: gunicorn otree_startup:wsgi --log-file -
