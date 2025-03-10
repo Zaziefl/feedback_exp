@@ -4,11 +4,13 @@ certifi==2025.1.31
 click==7.1.2
 dj-database-url==2.3.0
 Django==5.1.7
+gunicorn==23.0.0
 h11==0.14.0
 itsdangerous==1.1.0
 MarkupSafe==1.1.1
 numpy==2.2.3
 otree==5.11.1
+packaging==24.2
 pandas==2.2.3
 python-dateutil==2.9.0.post0
 python-multipart==0.0.5
