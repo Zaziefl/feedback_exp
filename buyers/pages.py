@@ -246,14 +246,11 @@ class Results(Page):
 
 
 class QuizWaitPage(WaitPage):
-    wait_for_all_groups = True
-
     def is_displayed(self):
-        return True
+        return self.round_number == 1  # Only apply in round 1
 
     def after_all_players_arrive(self):
         pass
-
 
 
 page_sequence = [Instruction, Quiz, Answers, QuizWaitPage, Start, TransitionPage, Choice, Feedback]
