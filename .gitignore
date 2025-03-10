@@ -10,5 +10,4 @@ __temp*
 __pycache__/
 *.py[cod]
 .DS_Store
-*.otreezipdb.sqlite3
-__pycache__/
+*.otreezip

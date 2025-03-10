@@ -4,22 +4,14 @@ SESSION_CONFIGS = [
     dict(name='SVO',
          app_sequence=['svo'],
          num_demo_participants=4,
-         condition_pos_default=0,
-         rounds_new_matrix=[1, 4, 9, 12, 17],
-         rounds_per_matrix=[3, 5, 3, 5],
-         owner_first=0
         ),
 dict(name='buyers',
          app_sequence=['buyers'],
          num_demo_participants=4,
-         condition_pos_default=0,
-         rounds_new_matrix=[1, 4, 9, 12, 17],
-         rounds_per_matrix=[3, 5, 3, 5],
-         owner_first=0
         ),
 dict(name='Full',
          app_sequence=['Instruction', 'svo', 'buyers', 'survey', 'Results'],
-         num_demo_participants=4,
+         num_demo_participants=6,
         ),
 ]
 
@@ -69,4 +61,5 @@ Here are some oTree games.
 """
 
 SECRET_KEY = '8439487796573'
-INSTALLED_APPS = ["otree", "buyers", "svo", "survey"]
+
+INSTALLED_APPS = ['otree']
