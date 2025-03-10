@@ -1,0 +1,50 @@
+{% block title %}
+    Item quality
+{% endblock %}
+
+{% block content %}
+
+<!-- Always display the item quality and earnings -->
+{% if player.item_quality %}
+    <p>The quality of the item is <b>good</b>.</p>
+    <p>You earned <b>10 points</b>.</p>
+    <p>Your total for this round will be <b>20 points</b>.</p>
+{% else %}
+    <p>The quality of the item is <b>bad</b>.</p>
+    <p>You lost <b>5 points</b>.</p>
+    <p>Your total for this round will be <b>5 points</b>.</p>
+{% endif %}
+
+<!-- Show message if item was not selected -->
+{% if not player.selected_item %}
+    <p>You did not select the item.</p>
+    <p>Your total for this round remains at <b>10 points</b>.</p>
+{% endif %}
+
+<hr>
+
+<!-- Only show feedback options if the item was selected -->
+{% if player.selected_item %}
+    {% if player.experimental_condition == 'control' %}
+        <p><b>Do you want to give a rating for the item?</b></p>
+        <p>Decide whether you want to publish a rating for a fee of <b>2 points</b>. Your published rating will appear next to the item and will be visible to other participants who can be presented with the same item in a following round.</p>
+
+        {{ formfield 'feedback' }}
+
+    {% elif player.experimental_condition == 'default' %}
+        <p><b>Remember: A positive rating will be published automatically for this item.</b></p>
+        <p>You can choose to change the positive rating to a negative rating at the cost of -2 points. If you do not change the rating, a positive rating will always be published.</p>
+
+        {{ formfield 'default_feedback_changed' }}
+
+    {% elif player.experimental_condition == 'omitted' %}
+        <p><b>Do you want to give a rating for the item?</b></p>
+        <p>Decide whether you want to publish a rating for a fee of <b>2 points</b>. If you decide not to give a rating, other participants will see that the item was selected, but no rating was given.</p>
+
+        {{ formfield 'feedback' }}
+    {% endif %}
+{% endif %}
+
+{{ next_button }}
+
+{% endblock %}
