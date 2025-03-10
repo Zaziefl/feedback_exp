@@ -1,1 +1,1 @@
-web: otree prodserver 8000
+web: cd feedback_exp && otree prodserver 8000
