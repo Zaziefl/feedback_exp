@@ -1,4 +1,11 @@
 from os import environ
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.config(default="postgres://ud3if1lg3n1dk1:pbb701783c442cb07bb8f7fe876dbeeef903ebaa82a4b9ca9757a620df3178a2b@c724r43q8jp5nk.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/d6btc0o51dni39")
+}
+
+
 
 SESSION_CONFIGS = [
     dict(name='SVO',
