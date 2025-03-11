@@ -7,7 +7,7 @@ SESSION_CONFIGS = [
         ),
 dict(name='buyers',
          app_sequence=['buyers'],
-         num_demo_participants=4,
+         num_demo_participants=6,
         ),
 dict(name='Full',
          app_sequence=['Instruction', 'svo', 'buyers', 'survey', 'Results'],
@@ -46,11 +46,13 @@ REAL_WORLD_CURRENCY_CODE = 'EUR'
 USE_POINTS = False
 
 ROOMS = [
-    dict(
-        name='exp_session',
-        display_name='Chosing Items Session',
-        participant_label_file='_rooms/tr.txt',
-    )]
+    {
+        'name': 'experiment_room',
+        'display_name': 'Experiment Room',
+        'participant_label_file': None,
+        'use_secure_urls': False,
+    },
+]
 
 ADMIN_USERNAME = 'admin'
 # for security, best to set admin password in an environment variable

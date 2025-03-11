@@ -138,9 +138,6 @@ class Choice(Page):
                 if self.player.experimental_condition == "omitted":
                     no_rating_given = feedback_data.get('no_rating', 0)
 
-        print(f"[DEBUG] Round {self.round_number} - Showing feedback? {ratings_visible}")
-        print(f"[DEBUG] Retrieved feedback for item {item_id}: {positive_ratings} positive, {negative_ratings} negative, {no_rating_given} no rating")
-
         return {
             "item_id": item_id,
             "item_quality": item_quality,
@@ -191,7 +188,6 @@ class Feedback(Page):
             item_id = self.player.item_id
             if item_id not in self.session.vars['truly_seen_items']:
                 self.session.vars['truly_seen_items'].add(item_id)
-                print(f"[DEBUG] Item {item_id} marked as TRULY SEEN after Feedback page")
 
         self.player.calculate_earnings()
 
@@ -253,4 +249,4 @@ class QuizWaitPage(WaitPage):
         pass
 
 
-page_sequence = [Instruction, Quiz, Answers, QuizWaitPage, Start, TransitionPage, Choice, Feedback]
+page_sequence = [Start, TransitionPage, Choice, Feedback]

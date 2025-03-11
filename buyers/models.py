@@ -52,7 +52,7 @@ class Subsession(BaseSubsession):
         # Group assignment
         players = self.get_players()
         random.shuffle(players)
-        group_size = 3 if len(players) % 3 == 0 else 2
+        group_size = 2 if len(players) % 2 == 0 else 3
         group_matrix = [players[i:i + group_size] for i in range(0, len(players), group_size)]
         self.set_group_matrix(group_matrix)
 
@@ -80,15 +80,12 @@ class Subsession(BaseSubsession):
         assign_seen_item = self.round_number in {4, 5, 6, 9, 10, 14, 15, 16}
 
         assigned_items = {}
+        used_up_items = self.session.vars.get('used_up_items', set())
+        already_assigned_seen_items = set()  # Track seen items assigned in this round
 
         print(f"[DEBUG] Assigning {'NEW' if assign_new_item else 'SEEN'} items in round {self.round_number}")
 
-        # Debug: Check seen items and group history BEFORE assignment
-        print(f"[DEBUG] Truly seen items BEFORE assignment: {self.session.vars['truly_seen_items']}")
-        for group_id, history in self.session.vars['group_item_history'].items():
-            print(f"[DEBUG] Group {group_id} has seen: {history}")
-
-        # Step 1: available items
+        # Step 1: Determine available items
         if assign_new_item:
             available_items = [
                 item for item in self.session.vars['items']
@@ -97,7 +94,7 @@ class Subsession(BaseSubsession):
         elif assign_seen_item:
             available_items = [
                 item for item in self.session.vars['items']
-                if item['id'] in self.session.vars['truly_seen_items']
+                if item['id'] in self.session.vars['truly_seen_items'] and item['id'] not in used_up_items
             ]
 
         random.shuffle(available_items)
@@ -111,76 +108,95 @@ class Subsession(BaseSubsession):
 
             assigned_item = None
 
+            # Assign new items in new rounds
             if assign_new_item and available_items:
                 assigned_item = available_items.pop(0)
                 self.session.vars['seen_items'].add(assigned_item['id'])
                 self.session.vars['group_item_history'][group_id].add(assigned_item['id'])
                 print(f"[DEBUG] Group {group_id} assigned NEW item {assigned_item['id']}")
 
+            # Assign seen items in seen rounds
             elif assign_seen_item:
                 valid_seen_items = [
                     item for item in available_items
                     if item['id'] in self.session.vars['truly_seen_items']  # Item was seen
-                       and item['id'] not in self.session.vars['group_item_history'][group_id]  # Group has NOT seen it
-                       and any(
-                        group_id != first_seen_group for first_seen_group in self.session.vars['group_item_history'])
+                       and item['id'] not in already_assigned_seen_items  # Ensure unique seen item per round
+                       and item['id'] not in self.session.vars['group_item_history'][group_id]  # Group has not seen it
                 ]
-
-                if len(valid_seen_items) == 0:
-                    print(
-                        f"[WARNING] No valid seen items left in round {self.round_number}, assigning a new item instead.")
-                    assign_new_item = True
-                    assign_seen_item = False
 
                 if valid_seen_items:
                     assigned_item = valid_seen_items.pop(0)
                     self.session.vars['group_item_history'][group_id].add(assigned_item['id'])
+                    already_assigned_seen_items.add(assigned_item['id'])  # Mark as assigned in this round
+                    available_items = [item for item in available_items if
+                                       item['id'] != assigned_item['id']]  # Remove globally
                     print(f"[DEBUG] Group {group_id} assigned SEEN item {assigned_item['id']}")
 
-                # === LAST RESORT: Assign a NEW unique item if everything else fails ===
+                    #the item has been seen twice
+                    seen_count = sum(
+                        assigned_item['id'] in history for history in self.session.vars['group_item_history'].values()
+                    )
+                    if seen_count >= 2:
+                        used_up_items.add(assigned_item['id'])
+                else:
+                    print(f"[WARNING] No valid seen items left for Group {group_id}, assigning a new item instead.")
+                    assign_new_item = True  # Switch to assigning a fallback new item
+                    assign_seen_item = False
+
+            # Fallback: Assign a new item if no valid seen item was available
             if not assigned_item:
                 fallback_items = [
                     item for item in self.session.vars['items']
                     if item['id'] not in self.session.vars['seen_items']
                 ]
-
                 if fallback_items:
                     assigned_item = fallback_items.pop(0)
                     self.session.vars['seen_items'].add(assigned_item['id'])
                     self.session.vars['group_item_history'][group_id].add(assigned_item['id'])
                     print(f"[DEBUG] Group {group_id} assigned UNIQUE NEW fallback item {assigned_item['id']}")
                 else:
-                    # Now we are truly out of items, so raise a real error
-                    raise Exception(
+                    print(
                         f"[CRITICAL ERROR] No available items (new or seen) for Group {group_id} in round {self.round_number}")
+                    # Instead of raising an error, assign a random available item to prevent breaking the experiment
+                    assigned_item = random.choice(self.session.vars['items'])
+                    self.session.vars['seen_items'].add(assigned_item['id'])
+                    self.session.vars['group_item_history'][group_id].add(assigned_item['id'])
+                    print(
+                        f"[DEBUG] Emergency assignment: Group {group_id} assigned fallback item {assigned_item['id']}")
 
             assigned_items[group_id] = assigned_item
 
-        # Step 4: Assign Item to Each Player in the Group
+        # Step 4: Assign Item to Player
         for player in players:
             group_id = player.participant.vars['group_id']
             assigned_item = assigned_items.get(group_id, None)
 
             if assigned_item:
                 player.item_id = assigned_item['id']
+                player.item_quality_original = assigned_item['quality']
                 player.item_quality = assigned_item['quality']
+                player.item_quality_flipped = False
                 if random.random() < 0.2:
                     player.item_quality = not assigned_item['quality']
+                    player.item_quality_flipped = True
 
-                print(f"[DEBUG] Player {player.id_in_group} in Group {group_id} assigned item {player.item_id}")
-            else:
-                print(f"[ERROR] No item assigned to Player {player.id_in_group} in Group {group_id}")
-                raise Exception(f"Critical Error: No valid item assigned to Player {player.id_in_group}")
+                item_id = player.item_id
+                player.num_ratings_per_item = self.session.vars['item_rating_count'].get(item_id, 0)
+                player.num_positive_ratings = self.session.vars['positive_rating_count'].get(item_id, 0)
+                player.num_negative_ratings = self.session.vars['negative_rating_count'].get(item_id, 0)
 
+        self.session.vars['used_up_items'] = used_up_items
 
 class Group(BaseGroup):
     pass
 
-
 class Player(BasePlayer):
     experimental_condition = models.StringField()
+    condition_sequence = models.StringField()
     item_id = models.StringField()
     item_quality = models.BooleanField(choices=[[False, 'Bad'], [True, 'Good']])
+    item_quality_original = models.BooleanField(choices=[[False, 'Bad'], [True, 'Good']])
+    item_quality_flipped = models.BooleanField(initial=False)
     selected_item = models.BooleanField(blank=True)
     feedback = models.IntegerField(choices=[(1, 'Positive'), (-1, 'Negative'), (0, 'No Rating')], blank=True)
     default_feedback_changed = models.BooleanField(
@@ -194,10 +210,10 @@ class Player(BasePlayer):
     num_negative_ratings = models.IntegerField(initial=0)
     num_ratings_given = models.IntegerField(initial=0)
 
-
     def set_experimental_condition(self):
         round_phase = 0 if self.round_number <= 6 else 1 if self.round_number <= 10 else 2
         self.experimental_condition = self.participant.vars['condition_sequence'][round_phase]
+        self.condition_sequence = ','.join(self.participant.vars['condition_sequence'])
 
     def calculate_earnings(self):
         self.earnings += C.endowment
@@ -218,19 +234,13 @@ class Player(BasePlayer):
                 self.earnings += C.feedback_cost
 
         # Ensure earnings accumulate across rounds
-        self.participant.payoff += self.earnings  # ADD earnings each round
-        print(f"[DEBUG] Player {self.id_in_group}: Round {self.round_number} earnings: {self.earnings}, Total: {self.participant.payoff}")
+        self.participant.payoff += self.earnings
 
-        self.participant.payoff += self.earnings  # Ensure total earnings accumulate
 
-        # Store the earnings in participant.vars so they can be accessed in the results app
         if "earnings_part2" not in self.participant.vars:
-            self.participant.vars["earnings_part2"] = 0  # Initialize if missing
+            self.participant.vars["earnings_part2"] = 0
 
-        self.participant.vars["earnings_part2"] += self.earnings  # Store Part 2 earnings
-
-        print(f"[DEBUG] Player {self.id_in_group}: Round {self.round_number} earnings: {self.earnings}, "
-              f"Total Part 2 Earnings: {self.participant.vars['earnings_part2']}, Overall Payoff: {self.participant.payoff}")
+        self.participant.vars["earnings_part2"] += self.earnings
 
         # Update player’s personal rating count
         if feedback in [1, -1]:
