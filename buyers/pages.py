@@ -223,7 +223,6 @@ class Feedback(Page):
             elif self.player.experimental_condition == 'default':
                 if self.player.field_maybe_none(
                         'default_feedback_changed'):
-                    self.player.earnings += C.feedback_cost
                     self.session.vars['item_feedback'][item_id]['negative'] += 1
                 else:
                     self.session.vars['item_feedback'][item_id]['positive'] += 1
