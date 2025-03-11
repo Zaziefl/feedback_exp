@@ -49,8 +49,6 @@ ROOMS = [
     {
         'name': 'experiment_room',
         'display_name': 'Experiment Room',
-        'participant_label_file': None,
-        'use_secure_urls': False,
     },
 ]
 
