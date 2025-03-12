@@ -248,4 +248,4 @@ class QuizWaitPage(WaitPage):
         pass
 
 
-page_sequence = [Start, TransitionPage, Choice, Feedback]
+page_sequence = [Instruction, Quiz, Answers, QuizWaitPage, Start, TransitionPage, Choice, Feedback]
