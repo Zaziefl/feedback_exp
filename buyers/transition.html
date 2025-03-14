@@ -5,13 +5,13 @@
 {% block content %}
     <p>{{ transition_text|safe }}</p>
     <p>Click 'Next' to continue to the next rounds.</p>
+
+    <p><b>The "Next" button will activate after <span id="countdown" class="countdown">30</span> seconds to ensure you have enough time to read the instructions carefully.</b></p>
+
+    <button id="nextButton" class="otree-btn-next btn btn-primary" disabled>Next</button>
 {% endblock %}
 
-<p><b>The "Next" button will activate after <span id="countdown" class="countdown">30</span> seconds to ensure you have enough time to read the instructions carefully.</b></p>
-
-<button id="nextButton" class="otree-btn-next btn btn-primary" disabled>Next</button>
-
-{{ block scripts }}
+{% block scripts %}
 <script>
     const nextBtn = document.getElementById("nextButton");
     nextBtn.disabled = true;
@@ -29,4 +29,4 @@
         }
     }, 1000);
 </script>
-{{ endblock }}
+{% endblock %}
