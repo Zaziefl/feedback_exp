@@ -216,7 +216,7 @@ class Player(BasePlayer):
         self.condition_sequence = ','.join(self.participant.vars['condition_sequence'])
 
     def calculate_earnings(self):
-        self.earnings += C.endowment
+        self.earnings = C.endowment
 
         if self.selected_item:
             self.earnings += C.good_item_bonus if self.item_quality else C.bad_item_penalty
@@ -233,9 +233,8 @@ class Player(BasePlayer):
             if self.field_maybe_none('default_feedback_changed') or False:
                 self.earnings += C.feedback_cost
 
-        # Ensure earnings accumulate across rounds
+        #earnings accumulate across rounds
         self.participant.payoff += self.earnings
-
 
         if "earnings_part2" not in self.participant.vars:
             self.participant.vars["earnings_part2"] = 0

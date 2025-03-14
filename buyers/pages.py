@@ -184,6 +184,7 @@ class Feedback(Page):
         }
 
     def before_next_page(self):
+        self.player.calculate_earnings()
         if self.player.selected_item is not None:
             item_id = self.player.item_id
             if item_id not in self.session.vars['truly_seen_items']:
@@ -211,7 +212,7 @@ class Feedback(Page):
 
             # Omitted condition
             elif self.player.experimental_condition == 'omitted':
-                if feedback == 0 or feedback is None:
+                if self.player.field_maybe_none('feedback') in [0, None]:
                     self.player.no_feedback_given = True
                     self.session.vars['item_feedback'][item_id]['no_rating'] += 1
                 elif feedback == 1:
@@ -227,22 +228,11 @@ class Feedback(Page):
                 else:
                     self.session.vars['item_feedback'][item_id]['positive'] += 1
 
-class Results(Page):
-    def is_displayed(self):
-        return self.round_number == C.NUM_ROUNDS
-
-    def vars_for_template(self):
-        total_earnings = sum([p.earnings for p in self.player.in_all_rounds()])
-        self.participant.payoff = total_earnings
-
-        return {
-            'total_earnings': total_earnings
-        }
-
-
 class QuizWaitPage(WaitPage):
+    wait_for_all_groups = True
+
     def is_displayed(self):
-        return self.round_number == 1  # Only apply in round 1
+        return self.round_number == 1
 
     def after_all_players_arrive(self):
         pass
