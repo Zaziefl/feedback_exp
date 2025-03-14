@@ -4,19 +4,19 @@
 
 {% block content %}
 
-<!-- Always display the item quality and earnings -->
-{% if player.item_quality %}
-    <p>The quality of the item is <b>good</b>.</p>
-    <p>You earned <b>10 points</b>.</p>
-    <p>Your total for this round will be <b>20 points</b>.</p>
+<!-- If the player selected the item, show item quality and earnings -->
+{% if player.selected_item %}
+    {% if player.item_quality %}
+        <p>The quality of the item is <b>good</b>.</p>
+        <p>You earned <b>10 points</b>.</p>
+        <p>Your total for this round will be <b>20 points</b>.</p>
+    {% else %}
+        <p>The quality of the item is <b>bad</b>.</p>
+        <p>You lost <b>5 points</b>.</p>
+        <p>Your total for this round will be <b>5 points</b>.</p>
+    {% endif %}
 {% else %}
-    <p>The quality of the item is <b>bad</b>.</p>
-    <p>You lost <b>5 points</b>.</p>
-    <p>Your total for this round will be <b>5 points</b>.</p>
-{% endif %}
-
-<!-- Show message if item was not selected -->
-{% if not player.selected_item %}
+    <!-- If the item was not selected, show this message instead -->
     <p>You did not select the item.</p>
     <p>Your total for this round remains at <b>10 points</b>.</p>
 {% endif %}
