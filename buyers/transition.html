@@ -5,5 +5,28 @@
 {% block content %}
     <p>{{ transition_text|safe }}</p>
     <p>Click 'Next' to continue to the next rounds.</p>
-    {{ next_button }}
 {% endblock %}
+
+<p><b>The "Next" button will activate after <span id="countdown" class="countdown">30</span> seconds to ensure you have enough time to read the instructions carefully.</b></p>
+
+<button id="nextButton" class="otree-btn-next btn btn-primary" disabled>Next</button>
+
+{{ block scripts }}
+<script>
+    const nextBtn = document.getElementById("nextButton");
+    nextBtn.disabled = true;
+
+    let countdown = 30;
+    const countdownElement = document.getElementById("countdown");
+
+    const timer = setInterval(function () {
+        countdown--;
+        countdownElement.textContent = countdown;
+
+        if (countdown <= 0) {
+            clearInterval(timer);
+            nextBtn.disabled = false;
+        }
+    }, 1000);
+</script>
+{{ endblock }}
