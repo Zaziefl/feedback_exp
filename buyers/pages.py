@@ -28,7 +28,7 @@ class TransitionPage(Page):
             transition_text = """
                 <p>In the coming rounds, the rules for leaving a rating are as follows:</p>
                 <p>If you select an item, a <b>positive rating is left automatically</b>. 
-                You can change it to a negative rating at a cost of <b>-2 points</b>.
+                You can change it to a negative rating at a cost of <b>2 points</b>.
                 If you decide not to change the rating, a positive rating will always be published.</p>
                 
                 <p>For example, the ratings for an item can look like this:</p>
@@ -38,7 +38,7 @@ class TransitionPage(Page):
         elif condition == "omitted":
             transition_text = """
                 <p>In the coming rounds, the rules for leaving a rating are as follows:</p>
-                <p>If you select an item, you can choose to leave a rating (positive or negative). Leaving a rating costs <b>-2 points</b>. 
+                <p>If you select an item, you can choose to leave a rating (positive or negative). Leaving a rating costs <b>2 points</b>. 
                 If you decide to leave a rating, this rating will be visible to other participants who are offered the same item in a later round. 
                 You can also choose not to leave a rating. If you decide not to leave a rating, no rating will be shown to other participants. 
                 However, participants will be informed that the item was selected, but <b>no rating was given</b>.</p
@@ -50,7 +50,7 @@ class TransitionPage(Page):
         else:  # Control condition
             transition_text = """
                 <p>In the coming rounds, the rules for leaving a rating are as follows:</p>
-                <p>If you select an item, you can choose to leave a rating (positive or negative). Leaving a rating costs <b>-2 points</b>. 
+                <p>If you select an item, you can choose to leave a rating (positive or negative). Leaving a rating costs <b>2 points</b>. 
                 If you decide to leave a rating, this rating will be visible to other participants who are offered the same item in a later round. 
                 You can also choose not to leave a rating. 
                 If you decide not to leave a rating, other participants will not know you selected the item and no rating will be shown.</p>

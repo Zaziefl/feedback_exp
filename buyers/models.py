@@ -81,7 +81,7 @@ class Subsession(BaseSubsession):
 
         assigned_items = {}
         used_up_items = self.session.vars.get('used_up_items', set())
-        already_assigned_seen_items = set()  # Track seen items assigned in this round
+        already_assigned_seen_items = set()
 
         print(f"[DEBUG] Assigning {'NEW' if assign_new_item else 'SEEN'} items in round {self.round_number}")
 
@@ -99,7 +99,7 @@ class Subsession(BaseSubsession):
 
         random.shuffle(available_items)
 
-        # Step 2: Assign Items to Groups
+        #Assign item to group
         for group_id in available_groups:
             print(f"[DEBUG] Assigning item to Group {group_id}")
 
@@ -140,7 +140,7 @@ class Subsession(BaseSubsession):
                         used_up_items.add(assigned_item['id'])
                 else:
                     print(f"[WARNING] No valid seen items left for Group {group_id}, assigning a new item instead.")
-                    assign_new_item = True  # Switch to assigning a fallback new item
+                    assign_new_item = True
                     assign_seen_item = False
 
             # Fallback: Assign a new item if no valid seen item was available
@@ -157,7 +157,6 @@ class Subsession(BaseSubsession):
                 else:
                     print(
                         f"[CRITICAL ERROR] No available items (new or seen) for Group {group_id} in round {self.round_number}")
-                    # Instead of raising an error, assign a random available item to prevent breaking the experiment
                     assigned_item = random.choice(self.session.vars['items'])
                     self.session.vars['seen_items'].add(assigned_item['id'])
                     self.session.vars['group_item_history'][group_id].add(assigned_item['id'])
@@ -166,7 +165,7 @@ class Subsession(BaseSubsession):
 
             assigned_items[group_id] = assigned_item
 
-        # Step 4: Assign Item to Player
+        #Assign Item to Player
         for player in players:
             group_id = player.participant.vars['group_id']
             assigned_item = assigned_items.get(group_id, None)
